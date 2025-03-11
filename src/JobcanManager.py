@@ -1,6 +1,7 @@
 import os
 import datetime
 import time
+import random
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -27,13 +28,19 @@ class JobcanManager:
         load_dotenv()
         self.email = os.getenv('EMAIL')
         self.password = os.getenv('PASSWORD')
-        self.start_time = os.getenv('START_TIME')
-        self.end_time = os.getenv('END_TIME')
         self.wait_sec = int(os.getenv('WAIT_SEC'))
+        self.start_time = self._create_random_time(base_time=os.getenv('START_TIME'))
+        self.end_time = self._create_random_time(base_time=os.getenv('END_TIME'))
 
     def _destroy(self) -> None:
         self.driver.close()
-    
+
+    def _create_random_time(self, base_time: str):
+        time_obj = datetime.datetime.strptime(base_time, "%H:%M")
+        random_minutes = random.randint(0, 8)
+        new_time_obj = time_obj + datetime.timedelta(minutes=random_minutes)
+        return new_time_obj.strftime("%H:%M")
+
     def _config_driver(self) -> None:
         options = webdriver.FirefoxOptions()
         options.add_argument('--headless')

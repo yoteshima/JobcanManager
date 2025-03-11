@@ -35,7 +35,7 @@ class JobcanManager:
     def _destroy(self) -> None:
         self.driver.close()
 
-    def _create_random_time(self, base_time: str):
+    def _create_random_time(self, base_time: str) -> str:
         time_obj = datetime.datetime.strptime(base_time, "%H:%M")
         random_minutes = random.randint(0, 8)
         new_time_obj = time_obj + datetime.timedelta(minutes=random_minutes)

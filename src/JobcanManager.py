@@ -28,18 +28,18 @@ class JobcanManager:
         load_dotenv()
         self.email = os.getenv('EMAIL')
         self.password = os.getenv('PASSWORD')
+        self.start_time = os.getenv('START_TIME')
+        self.end_time = os.getenv('END_TIME')
         self.wait_sec = int(os.getenv('WAIT_SEC'))
-        self.start_time = self._create_random_time(base_time=os.getenv('START_TIME'))
-        self.end_time = self._create_random_time(base_time=os.getenv('END_TIME'))
+
 
     def _destroy(self) -> None:
         self.driver.close()
 
-    def _create_random_time(self, base_time: str) -> str:
-        time_obj = datetime.datetime.strptime(base_time, "%H:%M")
-        random_minutes = random.randint(0, 8)
-        new_time_obj = time_obj + datetime.timedelta(minutes=random_minutes)
-        return new_time_obj.strftime("%H:%M")
+
+    def _create_random_sec(self, min: int = 30, max: int = 600) -> int:
+        return random.randint(a=min, b=max)
+
 
     def _config_driver(self) -> None:
         options = webdriver.FirefoxOptions()
@@ -60,7 +60,7 @@ class JobcanManager:
         # ページ遷移待機時間
         time.sleep(self.wait_sec)
 
-    
+
     def _is_workday(self, now: datetime.datetime) -> bool:
         return (now.weekday() in [0, 1, 2, 3, 4]) and not (jpholiday.is_holiday(now))
     
@@ -86,6 +86,12 @@ class JobcanManager:
         print('now: {}'.format(now.strftime("%Y/%m/%d %H:%M:%S")))
         if self._is_workday(now=now) and self._is_time_stamp_datetime(now=now):
             print('execute time stamp: {}'.format(now.strftime("%H:%M")))
+
+            # 待機時間(30秒～480秒)
+            wait_sec: int = self._create_random_sec(max=480)
+            print(f"wait sec: {wait_sec}")
+            time.sleep(wait_sec)
+
             self._config_driver()
             # ログイン
             self._login()
